@@ -11,7 +11,13 @@
       "displayName": "MDEngine (Official)",
       "description": "Molecular dynamics for agents: inspect a trajectory, render a frame or a video, and run LAMMPS or OpenMM jobs on hosted GPUs through the MDEngine MCP server.",
       "source": "./plugins/mdengine",
-      "category": "science"
+      "category": "science",
+      "skills": [
+        "./skills/mdengine",
+        "./skills/lammps-deck",
+        "./skills/potentials",
+        "./skills/results"
+      ]
     }
   ]
 }

@@ -14,7 +14,7 @@ claude plugin install mdengine@forcefieldsilicon
 
 | Plugin | What it gives an agent |
 | --- | --- |
-| [`mdengine`](plugins/mdengine/README.md) | The hosted MDEngine MCP server: check a deck, run LAMMPS or OpenMM on a GPU, watch the job, pull the results. Skills that teach an agent how to use it are coming. |
+| [`mdengine`](plugins/mdengine/README.md) | The hosted MDEngine MCP server plus four skills: check a deck, run LAMMPS or OpenMM on a GPU, watch the job, pull the results, and read them. |
 
 ## Credits and API keys
 

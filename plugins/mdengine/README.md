@@ -55,8 +55,14 @@ and Linux.
 
 ## Skills
 
-Skills that teach an agent the MDEngine workflow are coming in a later version of this
-plugin. Today the plugin ships the server connection.
+Four skills come with the plugin. Start with `mdengine`, which routes to the other three.
+
+| Skill | Read it for |
+| --- | --- |
+| [`mdengine`](skills/mdengine/SKILL.md) | Router. Which tool for which job, local against hosted, preflight before submit, where the API key comes from. |
+| [`lammps-deck`](skills/lammps-deck/SKILL.md) | Writing or repairing a deck the hosted runner accepts, and reading the preflight verdicts. |
+| [`potentials`](skills/potentials/SKILL.md) | Choosing LJ, EAM, Tersoff, ReaxFF or an ionic potential, what each costs, and which run on the GPU. |
+| [`results`](skills/results/SKILL.md) | Turning a finished run into numbers and pictures: the analysis tools, the renderers, exports, fetching hosted results. |
 
 ## Licensing
 
