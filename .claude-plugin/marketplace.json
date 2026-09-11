@@ -1,0 +1,17 @@
+{
+  "name": "forcefieldsilicon",
+  "description": "Official ForceField Silicon plugins for Claude Code. MDEngine gives an agent molecular-dynamics tools: trajectory analysis, rendering, and LAMMPS or OpenMM runs on hosted GPUs.",
+  "version": "0.1.0",
+  "owner": {
+    "name": "ForceField Silicon (Gitinama Inc.)"
+  },
+  "plugins": [
+    {
+      "name": "mdengine",
+      "displayName": "MDEngine (Official)",
+      "description": "Molecular dynamics for agents: inspect a trajectory, render a frame or a video, and run LAMMPS or OpenMM jobs on hosted GPUs through the MDEngine MCP server.",
+      "source": "./plugins/mdengine",
+      "category": "science"
+    }
+  ]
+}

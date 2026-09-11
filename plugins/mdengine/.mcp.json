@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mdengine-cloud": {
+      "type": "http",
+      "url": "https://api.forcefieldsilicon.com/mcp"
+    }
+  }
+}

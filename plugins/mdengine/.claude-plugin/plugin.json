@@ -1,0 +1,19 @@
+{
+  "name": "mdengine",
+  "version": "0.1.0",
+  "description": "Trajectory analysis and LAMMPS or OpenMM GPU runs for agents, through the hosted MDEngine MCP server.",
+  "author": {
+    "name": "ForceField Silicon (Gitinama Inc.)"
+  },
+  "homepage": "https://forcefieldsilicon.com/mdengine",
+  "repository": "https://github.com/forcefieldsilicon/mdengine",
+  "license": "Apache-2.0",
+  "keywords": [
+    "molecular-dynamics",
+    "lammps",
+    "openmm",
+    "mcp",
+    "gpu",
+    "trajectory"
+  ]
+}
