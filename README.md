@@ -10,6 +10,18 @@ claude plugin marketplace add forcefieldsilicon/mdengine-plugins
 claude plugin install mdengine@forcefieldsilicon
 ```
 
+## Use in Claude Science
+
+1. Add the hosted server. In Settings > Connectors > Add connector > Remote, name it
+   `mdengine-cloud` and set the server URL to `https://api.forcefieldsilicon.com/mcp`.
+   Under Advanced settings, pick the Streamable HTTP transport. Sign in with the key
+   from a credit pack.
+2. Add the skills. In Settings > Skills > Add skill > Import from GitHub, enter
+   `forcefieldsilicon/mdengine-plugins` and select the four skills: `mdengine`,
+   `lammps-deck`, `potentials` and `results`.
+3. `skills/` at the repo root mirrors `plugins/mdengine/skills/`, kept identical by
+   `scripts/sync_skills.sh --check`.
+
 ## Plugins
 
 | Plugin | What it gives an agent |

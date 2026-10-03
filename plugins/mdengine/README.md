@@ -3,7 +3,8 @@
 Molecular dynamics an agent can actually run. This plugin connects Claude Code to
 the hosted MDEngine MCP server, so a session can check a LAMMPS or OpenMM deck,
 run it on a GPU, follow the job, and pull the results back. Nothing to build and
-nothing to install on the machine.
+nothing to install on the machine. The same skills import into Claude Science from
+this repo. See [Use in Claude Science](../../README.md#use-in-claude-science) in the root README.
 
 MDEngine is made by ForceField Silicon (Gitinama Inc.). The product page is
 [forcefieldsilicon.com/mdengine](https://forcefieldsilicon.com/mdengine).
