@@ -143,9 +143,9 @@ prices. The quoted study (below) is priced by quote, not by this formula.
 
 ## Self-serve today
 
-The hosted server `mdengine-cloud` (version 0.7.0) has 13 tools: `guide`, `account`,
-`capabilities`, `preflight_deck`, `submit_job`, `create_job`, `start_job`, `job_status`, `job_log`,
-`job_results`, `list_jobs`, `delete_results`, `cancel_job`. Name no others.
+The hosted server `mdengine-cloud` (version 0.8.0) has 14 tools: `guide`, `account`,
+`capabilities`, `preflight_deck`, `campaign_request`, `submit_job`, `create_job`, `start_job`,
+`job_status`, `job_log`, `job_results`, `list_jobs`, `delete_results`, `cancel_job`. Name no others.
 
 Add it:
 
@@ -154,7 +154,7 @@ Add it:
 - claude.ai, or Claude Desktop: add a custom connector with the URL
   `https://api.forcefieldsilicon.com/mcp` and sign in when asked.
 
-Since 2026-10-08, `guide`, `capabilities` and `preflight_deck` answer without a key.
+Since 2026-10-08, `guide`, `capabilities`, `preflight_deck` and `campaign_request` answer without a key.
 `account` and every job tool need an API key from a credit pack at
 https://forcefieldsilicon.com/mdengine.
 Calling a keyed tool without a key returns a message with the sign-in path instead of running. The user signs in there: in Claude Code, type `/mcp`, pick `mdengine-cloud`, Authenticate; in claude.ai, press Connect on the connector. Never paste a key in chat.
@@ -232,7 +232,12 @@ result as theirs.
 - The campaign grid and the matrix report with tiers and the compromises sheet.
 - Phase 0 itself.
 
-When the customer wants any of these, say: "This part is not self-serve yet. Email
+When the customer wants any of these, first call `campaign_request` with customer_type
+`mineral-processing`, the user's question, what they already have (inputs_available), the
+grid in words, their data rules and their contact email. Read back request_id,
+tier_that_fits, price_band and what_we_need to the user, then gather what_we_need. For
+this customer type the price band is confirmed by a person within one business day.
+If the tool cannot be reached, say: "This part is not self-serve yet. Email
 arvand@gitinama.tech with the subject "MDEngine study" and the inputs listed in What you
 supply. The page https://forcefieldsilicon.com/mdengine/start/ has the same address."
 Name no person beyond that address. Do not invent a quote URL or a price.
