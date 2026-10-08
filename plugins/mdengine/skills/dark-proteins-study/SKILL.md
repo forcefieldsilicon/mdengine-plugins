@@ -122,24 +122,31 @@ Released or validated today, and used in every study:
 
 ## Cost
 
-Call `account`. It returns the GPU classes, the rate table and how jobs are
-priced. Do not quote a rate from memory.
+Call `account`. It returns the pricing mode, the rate table and the credit
+packs. Read the numbers from it, not from memory. On 2026-10-07 the mode was
+"job": a job is priced by the work the deck does, in atom-steps (atoms x
+timesteps), at a price per class of potential. The OpenMM class was $0.02
+per billion atom-steps, plus a base of $0.05 per job. A job never costs more
+than its wall limit times the rate table ($2 per GPU-hour that day).
 
 The arithmetic:
 
 ```text
-cost = cells x seeds x GPU-hours per run x rate per GPU-hour
-cells = ligands x pocket conformations   (stage 2)
-cells = 1 model                          (stage 1, seeds = replicas)
+per job   = atoms x steps x class price + base
+            capped at wall_limit_s / 3600 x rate per GPU-hour
+study     = cells x seeds x per job
+cells     = ligands x pocket conformations   (stage 2)
+cells     = 1 model                          (stage 1, seeds = replicas)
 ```
 
-Each job is also capped at `wall_limit_s x rate`, and the balance must cover
-that cap when the job is submitted. GPU time is rarely the bottleneck.
-Preparing poses and parameters for unfamiliar ligands takes longer than
-running them, and the quote prices that work separately.
+A solvated protein has far more atoms than the protein alone. Count the
+water and ions when you estimate. The balance must cover the wall-limit cap
+when a job is submitted. GPU time is rarely the bottleneck. Preparing poses
+and parameters for unfamiliar ligands takes longer than running them, and
+the quote prices that work separately.
 
 Credit packs on the public page: $25 Starter, $100 Lab, $500 Lab Group.
-Give no other prices.
+Quote no other prices without calling `account` first.
 
 ## Self-serve today
 
@@ -153,12 +160,15 @@ https://forcefieldsilicon.com/mdengine. Without a key, every call, including
 `capabilities`, returns unauthorized today. Tell your user that before they
 expect anything else.
 
-With a key, a user who can write their own OpenMM script can run stage 1
-themselves. `submit_job` takes `runner: "openmm"`, which runs
-`python3 <input>` on the OpenMM image. The tool marks this runner as beta.
+With a key, a user who has an OpenMM protocol can run stage 1 themselves.
+The hosted runners are three: `lammps` (the default, KOKKOS on the GPU),
+`lammps-full` (a wider package set) and `openmm`, which runs every force on
+the GPU when the CUDA platform is selected. Protein runs go through the same
+`submit_job` call with `runner: "openmm"`, which runs `python3 <input>`. The
+tool marks this runner as beta. The endpoint picks the image the deck needs.
 The flow:
 
-1. `account`, to see the balance and the rate.
+1. `account`, to see the balance, the pricing and the packs.
 2. `capabilities` with `runner: "openmm"`, to see what the image has.
 3. `submit_job` with the script, the prepared system files, `runner:
    "openmm"`, a `label`, a `wall_limit_s` and an `end_marker`. One job per
