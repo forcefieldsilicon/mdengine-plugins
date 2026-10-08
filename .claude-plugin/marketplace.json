@@ -16,7 +16,9 @@
         "./skills/mdengine",
         "./skills/lammps-deck",
         "./skills/potentials",
-        "./skills/results"
+        "./skills/results",
+        "./skills/dark-proteins-study",
+        "./skills/mineral-processing-campaign"
       ]
     }
   ]
