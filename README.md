@@ -17,8 +17,9 @@ claude plugin install mdengine@forcefieldsilicon
    Under Advanced settings, pick the Streamable HTTP transport. Sign in with the key
    from a credit pack.
 2. Add the skills. In Settings > Skills > Add skill > Import from GitHub, enter
-   `forcefieldsilicon/mdengine-plugins` and select the four skills: `mdengine`,
-   `lammps-deck`, `potentials` and `results`.
+   `forcefieldsilicon/mdengine-plugins` and select the six skills: `mdengine`,
+   `lammps-deck`, `potentials`, `results`, `mineral-processing-campaign` and
+   `dark-proteins-study`.
 3. `skills/` at the repo root mirrors `plugins/mdengine/skills/`, kept identical by
    `scripts/sync_skills.sh --check`.
 
@@ -26,7 +27,7 @@ claude plugin install mdengine@forcefieldsilicon
 
 | Plugin | What it gives an agent |
 | --- | --- |
-| [`mdengine`](plugins/mdengine/README.md) | The hosted MDEngine MCP server plus four skills: check a deck, run LAMMPS or OpenMM on a GPU, watch the job, pull the results, and read them. |
+| [`mdengine`](plugins/mdengine/README.md) | The hosted MDEngine MCP server plus six skills: check a deck, run LAMMPS or OpenMM on a GPU, watch the job, pull the results, and read them. |
 
 ## Credits and API keys
 
