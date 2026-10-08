@@ -99,16 +99,27 @@ Say these to the customer before the run and print them with the results.
 
 ## Cost
 
-Call `account` first. It returns the GPU rate table, how jobs are priced and the credit
-packs. A 3 x 3 x 3 grid is 27 jobs. The arithmetic to show the customer:
+Call `account` first. It returns the rate table, how jobs are priced and the credit
+packs. Read the numbers from it, not from this guide.
+
+Jobs are priced by the work the deck does, in atom-steps (atoms x timesteps), at a
+price per class of pair style, plus a base per job. A Born-Mayer-Huggins or `table`
+pair style falls in the default class unless the rate table says otherwise. As of
+2026-10-07 the default class was $0.2 per billion atom-steps and the base $0.05 per job.
+A job never costs more than its wall limit x the GPU rate ($2 per GPU hour as of the same
+date).
 
 ```
-upper bound per grid = 27 jobs x wall hours per job x rate per GPU hour
+cost per job  = ions x steps x class price + base per job
+cost per grid = 27 jobs x cost per job          (3 compositions x 3 temperatures x 3 replicas)
+cap per job   = wall_limit_s / 3600 x rate per GPU hour
 ```
 
-`account` says whether jobs are priced per job or metered by the second. Per-job pricing
-is capped at wall_limit_s x rate, so the formula above is the ceiling either way. A
-submit holds wall_limit_s x rate of the balance until the job ends, so the balance must
+Example of the arithmetic, not a quote: 3,000 ions x 2,000,000 steps is 6 billion
+atom-steps, so 6 x $0.2 + $0.05 = $1.25 per job at the default class. Redo it with the
+customer's ion count and run length and the prices `account` returns.
+
+A submit holds wall_limit_s x rate of the balance until the job ends, so the balance must
 cover the jobs that run at once, not only the first one.
 
 Credit packs on the public page: Starter $25, Lab $100, Lab Group $500. Quote no other
@@ -144,8 +155,11 @@ group), the stress autocorrelation if viscosity is wanted, and a `print DONE` li
    ```
 
    It reports missing styles, CPU-only styles, and whether the pair style uses the GPU.
-   An ionic pair style that is CPU-only still runs, on the pod's CPU cores at the GPU
-   rate. Tell the customer before submitting. The lammps-deck skill reads the verdicts.
+   Read the gpu flag per style. On the default image `buck/coul/long`, `coul/long`,
+   `table` and `hybrid/overlay` run on the GPU; `born/coul/long` does not. A
+   Born-Mayer-Huggins deck either runs on the pod's CPU cores at the same price, or is
+   tabulated to `pair_style table` with `pppm` to use the GPU. Do not promise which path
+   until preflight says. The lammps-deck skill reads the verdicts.
 
 2. **Submit one job per grid cell.** Label every cell so the grid can be rebuilt from
    `list_jobs` alone.
