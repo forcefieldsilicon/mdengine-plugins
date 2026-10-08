@@ -185,11 +185,8 @@ The hosted server `mdengine-cloud` at `https://api.forcefieldsilicon.com/mcp`
 
 Since 2026-10-08, `guide`, `capabilities` and `preflight_deck` answer
 without a key. `account` and every job tool need an API key from a credit
-pack at https://forcefieldsilicon.com/mdengine. Calling a keyed tool without
-Calling a keyed tool without a key returns a message with the sign-in path instead of running; the user signs in there (Claude Code: type /mcp, pick mdengine-cloud, Authenticate; claude.ai: Connect on the connector) and never pastes the key in chat. That is the moment the user
-pastes the key: in Claude Code, type `/mcp`, pick `mdengine-cloud`,
-Authenticate; in claude.ai, press Connect on the connector. Never ask for the
-key in chat, and never paste it there.
+pack at https://forcefieldsilicon.com/mdengine.
+Calling a keyed tool without a key returns a message with the sign-in path instead of running. The user signs in there: in Claude Code, type `/mcp`, pick `mdengine-cloud`, Authenticate; in claude.ai, press Connect on the connector. Never paste a key in chat.
 
 If a web page comes back to you summarised, fetch
 https://api.forcefieldsilicon.com/llms.txt. It is the plain-text summary of
