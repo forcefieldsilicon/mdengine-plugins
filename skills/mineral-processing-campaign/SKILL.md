@@ -99,36 +99,52 @@ Say these to the customer before the run and print them with the results.
 
 ## Cost
 
-Call `account` first. It returns the rate table, how jobs are priced and the credit
-packs. Read the numbers from it, not from this guide.
+Call `account` first, once the user has a key. It returns the rate table, how jobs are
+priced and the credit packs. Take the live numbers from `account`, not from this guide.
+Without a key, `capabilities` shows the same rate table.
 
-Jobs are priced by the work the deck does, in atom-steps (atoms x timesteps), at a
-price per class of pair style, plus a base per job. A Born-Mayer-Huggins or `table`
-pair style falls in the default class unless the rate table says otherwise. As of
-2026-10-07 the default class was $0.2 per billion atom-steps and the base $0.05 per job.
-A job never costs more than its wall limit x the GPU rate ($2 per GPU hour as of the same
-date).
+A job has a base charge and two work terms, each priced per class of pair style. A
+Born-Mayer-Huggins or `table` pair style falls in the default class unless the rate
+table lists it.
 
 ```
-cost per job  = ions x steps x class price + base per job
-cost per grid = 27 jobs x cost per job          (3 compositions x 3 temperatures x 3 replicas)
-cap per job   = wall_limit_s / 3600 x rate per GPU hour
+cost per job  = base_usd_per_job
+              + timesteps / 1,000,000 x usd_per_mstep[class]
+              + atom-steps / 1,000,000,000 x usd_per_gatom_step[class]
+                (atom-steps = ions x timesteps)
+billed        = the lower of cost per job and wall_limit_s / 3600 x rate per GPU hour
+cost per grid = 27 jobs x billed per job   (3 compositions x 3 temperatures x 3 replicas)
 ```
 
-Example of the arithmetic, not a quote: 3,000 ions x 2,000,000 steps is 6 billion
-atom-steps, so 6 x $0.2 + $0.05 = $1.25 per job at the default class. Redo it with the
-customer's ion count and run length and the prices `account` returns.
+As of 2026-10-08 the live table read: base $0.05 per job, default class $2 per million
+timesteps and $0.2 per billion atom-steps, rate $2 per GPU hour.
 
-A submit holds wall_limit_s x rate of the balance until the job ends, so the balance must
-cover the jobs that run at once, not only the first one.
+Example of the arithmetic, not a quote, 2026-10-08 prices: 3,000 ions x 2,000,000 steps.
+
+```
+base                                     $0.05
+2,000,000 steps = 2 million x $2         $4.00
+6 billion atom-steps x $0.2              $1.20
+per job                                  $5.25   (under the 4 h cap of $8)
+27 jobs                                $141.75
+```
+
+Redo it with the customer's ion count, run length and the prices `account` returns.
+
+**Balance hold.** A queued or running job reserves wall_limit_s x rate from the balance
+until it finishes. At a 4 h wall that is $8 per job. All 27 cells submitted at once hold
+27 x $8 = $216. A submit that the balance cannot cover is refused. So run the cells in
+batches sized to the pack: Starter $25 holds 3 jobs at a time, Lab $100 holds 12. Neither
+covers the whole grid's $141.75. The Lab Group pack ($500) covers the whole grid, held
+all at once. Tell the customer this before they buy.
 
 Credit packs on the public page: Starter $25, Lab $100, Lab Group $500. Quote no other
 prices. The quoted study (below) is priced by quote, not by this formula.
 
 ## Self-serve today
 
-The hosted server `mdengine-cloud` has 12 tools: `account`, `capabilities`,
-`preflight_deck`, `submit_job`, `create_job`, `start_job`, `job_status`, `job_log`,
+The hosted server `mdengine-cloud` (version 0.7.0) has 13 tools: `guide`, `account`,
+`capabilities`, `preflight_deck`, `submit_job`, `create_job`, `start_job`, `job_status`, `job_log`,
 `job_results`, `list_jobs`, `delete_results`, `cancel_job`. Name no others.
 
 Add it:
@@ -138,10 +154,15 @@ Add it:
 - claude.ai, or Claude Desktop: add a custom connector with the URL
   `https://api.forcefieldsilicon.com/mcp` and sign in when asked.
 
-Every tool call needs an API key from a credit pack at https://forcefieldsilicon.com/mdengine.
-Without a key, every call returns `unauthorized`, including `capabilities` and
-`preflight_deck`. Say this plainly. Do not tell the customer what a deck would cost or
-whether it would run until a key is in place.
+Since 2026-10-08, `guide`, `capabilities` and `preflight_deck` answer without a key.
+`account` and every job tool need an API key from a credit pack at
+https://forcefieldsilicon.com/mdengine. Calling a keyed tool without a key today makes
+the client start a sign-in. That is the moment the user pastes the key: in Claude Code,
+type `/mcp`, pick `mdengine-cloud`, Authenticate; in claude.ai, press Connect on the
+connector. Never ask for the key in chat, and never paste it there.
+
+If a web page comes back to you summarised, fetch https://api.forcefieldsilicon.com/llms.txt.
+It is the plain-text summary of the service.
 
 This path assumes the customer already has a working LAMMPS deck for their melt and the
 potential files. We do not supply a molten-salt potential on this path. The deck should
@@ -213,9 +234,10 @@ result as theirs.
 - The campaign grid and the matrix report with tiers and the compromises sheet.
 - Phase 0 itself.
 
-When the customer wants any of these, say: "This part is not self-serve yet. Ask for a
-quote at https://forcefieldsilicon.com/mdengine, which carries the contact path." Bring
-the plan from "What you supply" with you. Do not invent a quote URL or a price.
+When the customer wants any of these, say: "This part is not self-serve yet. Email
+arvand@gitinama.tech with the subject "MDEngine study" and the inputs listed in What you
+supply. The page https://forcefieldsilicon.com/mdengine/start/ has the same address."
+Name no person beyond that address. Do not invent a quote URL or a price.
 
 ## Honesty rule for you, their Claude
 

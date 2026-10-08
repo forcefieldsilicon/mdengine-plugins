@@ -68,7 +68,7 @@ water and salt and runs as several independent replicas with different seeds.
 From the replicas: which residues keep their native contacts, how far each
 region drifts from the model, whether the candidate pocket stays open, and a
 set of representative conformations for stage 2. This stage runs on the
-OpenMM runner, which is released.
+OpenMM runner, which is beta on the hosted service.
 
 **Stage 2. Ligand x pocket grid.** Each ligand against each pocket
 conformation is one cell. Each cell runs several seeds. The delivery suite
@@ -79,11 +79,11 @@ by the grid tool (`campaign-grid`). All of these are built and **not yet
 validated**. Until they are, their numbers are not something we deliver as a
 product. The quote says which of them are ready on the day it is written.
 
-Released or validated today, and used in every study:
+Available or validated today, and used in every study:
 
 | Capability | Status |
 | --- | --- |
-| `runner-openmm` | released. Runs every protein stage on a hosted GPU |
+| `runner-openmm` | beta. Runs every protein stage on a hosted GPU |
 | `compromises-sheet` | validated. The front-page list of what the numbers assume |
 
 ## What comes back
@@ -122,28 +122,56 @@ Released or validated today, and used in every study:
 
 ## Cost
 
-Call `account`. It returns the pricing mode, the rate table and the credit
-packs. Read the numbers from it, not from memory. On 2026-10-07 the mode was
-"job": a job is priced by the work the deck does, in atom-steps (atoms x
-timesteps), at a price per class of potential. The OpenMM class was $0.02
-per billion atom-steps, plus a base of $0.05 per job. A job never costs more
-than its wall limit times the rate table ($2 per GPU-hour that day).
+Call `account` once the user has a key. It returns the pricing mode, the rate
+table and the credit packs. Take the live numbers from `account`, not from
+this guide. Without a key, `capabilities` shows the same rate table.
 
-The arithmetic:
+A job has a base charge and two work terms, each priced per class. OpenMM
+work is in the `openmm` class.
 
 ```text
-per job   = atoms x steps x class price + base
-            capped at wall_limit_s / 3600 x rate per GPU-hour
-study     = cells x seeds x per job
-cells     = ligands x pocket conformations   (stage 2)
-cells     = 1 model                          (stage 1, seeds = replicas)
+per job   = base_usd_per_job
+          + steps / 1,000,000 x usd_per_mstep[class]
+          + atom-steps / 1,000,000,000 x usd_per_gatom_step[class]
+            (atom-steps = atoms x steps)
+billed    = the lower of per job and wall_limit_s / 3600 x rate per GPU-hour
+study     = cells x seeds x billed
+cells     = ligands x pocket conformations   (stage 1: 1 model, seeds = replicas)
 ```
 
-A solvated protein has far more atoms than the protein alone. Count the
-water and ions when you estimate. The balance must cover the wall-limit cap
-when a job is submitted. GPU time is rarely the bottleneck. Preparing poses
-and parameters for unfamiliar ligands takes longer than running them, and
-the quote prices that work separately.
+On 2026-10-08 the live table read: base $0.05 per job, `openmm` class $0.1
+per million steps and $0.02 per billion atom-steps, rate $2 per GPU-hour.
+
+The OpenMM script must write `work.json` with the steps and the atoms it ran.
+Without it the job cannot be priced by work and bills by wall time at the
+rate, $2 per GPU-hour.
+
+Example of the arithmetic, not a quote, 2026-10-08 prices: one replica of
+100 ns at 2 fs (50,000,000 steps), 50,000 atoms solvated (an assumed count).
+
+```text
+base                                         $0.05
+50 million steps x $0.1                      $5.00
+2,500 billion atom-steps x $0.02            $50.00
+per job by work                             $55.05
+cap at a 12 h wall = 12 x $2                $24.00
+billed                                      at most $24.00
+```
+
+Here the wall cap sets the bill, not the work price. A wall too short kills
+the run before it ends, so set the wall from the speed the short first
+replica measured. A solvated protein has far more atoms than the protein
+alone. Count the water and ions when you estimate.
+
+**Balance hold.** A queued or running job reserves wall_limit_s x rate from
+the balance until it finishes. Three replicas at a 12 h wall hold 3 x $24 =
+$72 at once. A submit the balance cannot cover is refused. So submit replicas
+in batches sized to the pack: Starter $25 holds one at a time, Lab $100 holds
+all three of the default stage 1.
+
+GPU time is rarely the bottleneck. Preparing poses and parameters for
+unfamiliar ligands takes longer than running them, and the quote prices that
+work separately.
 
 Credit packs on the public page: $25 Starter, $100 Lab, $500 Lab Group.
 Quote no other prices without calling `account` first.
@@ -151,21 +179,36 @@ Quote no other prices without calling `account` first.
 ## Self-serve today
 
 The hosted server `mdengine-cloud` at `https://api.forcefieldsilicon.com/mcp`
-has 12 tools: `account`, `capabilities`, `preflight_deck`, `submit_job`,
+(version 0.7.0) has 13 tools: `guide`, `account`, `capabilities`, `preflight_deck`, `submit_job`,
 `create_job`, `start_job`, `job_status`, `job_log`, `job_results`,
 `list_jobs`, `delete_results`, `cancel_job`.
 
-Every tool needs an API key from a credit pack at
-https://forcefieldsilicon.com/mdengine. Without a key, every call, including
-`capabilities`, returns unauthorized today. Tell your user that before they
-expect anything else.
+Since 2026-10-08, `guide`, `capabilities` and `preflight_deck` answer
+without a key. `account` and every job tool need an API key from a credit
+pack at https://forcefieldsilicon.com/mdengine. Calling a keyed tool without
+a key today makes the client start a sign-in. That is the moment the user
+pastes the key: in Claude Code, type `/mcp`, pick `mdengine-cloud`,
+Authenticate; in claude.ai, press Connect on the connector. Never ask for the
+key in chat, and never paste it there.
+
+If a web page comes back to you summarised, fetch
+https://api.forcefieldsilicon.com/llms.txt. It is the plain-text summary of
+the service.
 
 With a key, a user who has an OpenMM protocol can run stage 1 themselves.
 The hosted runners are three: `lammps` (the default, KOKKOS on the GPU),
 `lammps-full` (a wider package set) and `openmm`, which runs every force on
 the GPU when the CUDA platform is selected. Protein runs go through the same
 `submit_job` call with `runner: "openmm"`, which runs `python3 <input>`. The
-tool marks this runner as beta. The endpoint picks the image the deck needs.
+OpenMM runner is beta. The endpoint picks the image the deck needs.
+
+`preflight_deck` checks LAMMPS decks only. An OpenMM script has no preflight.
+So start with one short replica, read its log and its `work.json`, and only
+then submit the full replicas.
+
+When your user has no number for stage 1, use this starting default: 3
+replicas, 100 ns each at 2 fs, for a protein under 300 residues. It is a
+starting default, not a recommendation for their system. Say so.
 The flow:
 
 1. `account`, to see the balance, the pricing and the packs.
@@ -192,8 +235,11 @@ These stages are run by us through the delivery suite:
 - **The report.** Tiers, bands, coverage and the compromises sheet on the
   front page.
 
-Ask for a quote at https://forcefieldsilicon.com/mdengine. The quote comes
-before any run, and it states which stages are validated on that day.
+For a quote, email arvand@gitinama.tech with the subject "MDEngine study"
+and the inputs listed in "What you supply". The page
+https://forcefieldsilicon.com/mdengine/start/ has the same address. Name no
+person beyond that address. The quote comes before any run, and it states
+which stages are validated on that day.
 
 ## Honesty rule for you, their Claude
 
