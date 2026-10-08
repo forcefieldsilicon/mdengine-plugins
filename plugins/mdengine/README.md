@@ -56,7 +56,7 @@ and Linux.
 
 ## Skills
 
-Four skills come with the plugin. Start with `mdengine`, which routes to the other three.
+Seven skills come with the plugin. Start with `mdengine` for runs and results. Start with `forcefield-studies` if you hold a study key.
 
 | Skill | Read it for |
 | --- | --- |
@@ -65,6 +65,8 @@ Four skills come with the plugin. Start with `mdengine`, which routes to the oth
 | [`potentials`](skills/potentials/SKILL.md) | Choosing LJ, EAM, Tersoff, ReaxFF or an ionic potential, what each costs, and which run on the GPU. |
 | [`results`](skills/results/SKILL.md) | Turning a finished run into numbers and pictures: the analysis tools, the renderers, exports, fetching hosted results. |
 | [`dark-proteins-study`](skills/dark-proteins-study/SKILL.md) | Planning a study of a protein with only a predicted structure: what it answers, what to supply, what is self-serve and what is quoted. |
+| [`mineral-processing-campaign`](skills/mineral-processing-campaign/SKILL.md) | Planning a molten-salt electrolyte study for mineral processing: what to supply, what runs, what it costs, what is self-serve and what is quoted. |
+| [`forcefield-studies`](skills/forcefield-studies/SKILL.md) | Following a study from your own Claude with a study key: connect, status, matrix, report, the launch grant, asking for a new study. |
 
 ## Licensing
 

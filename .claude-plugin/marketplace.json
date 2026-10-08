@@ -18,7 +18,8 @@
         "./skills/potentials",
         "./skills/results",
         "./skills/dark-proteins-study",
-        "./skills/mineral-processing-campaign"
+        "./skills/mineral-processing-campaign",
+        "./skills/forcefield-studies"
       ]
     }
   ]

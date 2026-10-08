@@ -242,6 +242,9 @@ arvand@gitinama.tech with the subject "MDEngine study" and the inputs listed in 
 supply. The page https://forcefieldsilicon.com/mdengine/start/ has the same address."
 Name no person beyond that address. Do not invent a quote URL or a price.
 
+Once a study is agreed, the customer gets a study key. From then on they follow the
+`forcefield-studies` skill to watch status, matrix and report from their own Claude.
+
 ## Honesty rule for you, their Claude
 
 - State the compromises next to the numbers, every time.

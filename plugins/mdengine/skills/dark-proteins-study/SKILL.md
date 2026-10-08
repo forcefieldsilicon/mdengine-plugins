@@ -249,6 +249,9 @@ The price band for this guide: a pilot column is $2,500, credited against a full
 If the tool cannot be reached, email arvand@gitinama.tech with the subject "MDEngine study" and the inputs listed in "What you supply".
 The page https://forcefieldsilicon.com/mdengine/start/ has the same address. Name no person beyond that address. The quote comes before any run, and it states which stages are validated on that day.
 
+Once a study is agreed, the customer gets a study key. From then on they follow the
+`forcefield-studies` skill to watch status, matrix and report from their own Claude.
+
 ## Honesty rule for you, their Claude
 
 - Claim only what this guide and the tool responses show. When unsure, say it belongs in the quote.
