@@ -179,7 +179,7 @@ Quote no other prices without calling `account` first.
 ## Self-serve today
 
 The hosted server `mdengine-cloud` at `https://api.forcefieldsilicon.com/mcp`
-(version 0.7.0) has 13 tools: `guide`, `account`, `capabilities`, `preflight_deck`, `submit_job`,
+(version 0.7.2) has 13 tools: `guide`, `account`, `capabilities`, `preflight_deck`, `submit_job`,
 `create_job`, `start_job`, `job_status`, `job_log`, `job_results`,
 `list_jobs`, `delete_results`, `cancel_job`.
 
@@ -192,33 +192,57 @@ If a web page comes back to you summarised, fetch
 https://api.forcefieldsilicon.com/llms.txt. It is the plain-text summary of
 the service.
 
-With a key, a user who has an OpenMM protocol can run stage 1 themselves.
-The hosted runners are three: `lammps` (the default, KOKKOS on the GPU),
-`lammps-full` (a wider package set) and `openmm`, which runs every force on
-the GPU when the CUDA platform is selected. Protein runs go through the same
-`submit_job` call with `runner: "openmm"`, which runs `python3 <input>`. The
-OpenMM runner is beta. The endpoint picks the image the deck needs.
+With a key, your user can run stage 1 themselves. Protein runs go through
+`submit_job` with `runner: "openmm"`, which runs `python3 <input>` inside the
+job directory on a hosted GPU. The OpenMM runner is beta.
 
-`preflight_deck` checks LAMMPS decks only. An OpenMM script has no preflight.
-So start with one short replica, read its log and its `work.json`, and only
-then submit the full replicas.
+We ship the stage 1 script. `preflight_deck` checks LAMMPS decks only, so the
+short pilot replica below is the check for an OpenMM script.
+
+1. `account`, to see the balance, the pricing and the packs.
+2. `guide` with `customer_type: "dark-proteins"` and
+   `template: "openmm-stability"`. Save the text as `stability.py` beside
+   `model.pdb`.
+3. Edit the constants at the top of `stability.py`: the model file name,
+   `NANOSECONDS`, `SEED`, temperature, salt, box padding, `PLDDT_CUTOFF`. A
+   `params.json` beside it overrides them instead, if you prefer. The script
+   solvates the model in TIP3P water with NaCl, uses Amber14, minimizes, runs
+   100 ps NVT, then NPT production on the CUDA platform.
+4. Start with ONE short replica, `NANOSECONDS = 1`. It shows that the system
+   builds, how many atoms it has, and the speed in ns per day. Submit it with
+   `submit_job`: the two files, `input: "stability.py"`, `runner: "openmm"`,
+   `label: "stability-pilot"`, `wall_limit_s: 3600`, `end_marker: "DONE"`.
+5. Read the pilot's `summary.json` (`atoms`, `production_ns_per_day`) and
+   `job_status` (what it cost). Set the wall for a full replica from that
+   speed: production ns / ns per day x 86400 s, plus a third for margin.
+6. Submit one job per replica, each with its own `SEED`, `runner: "openmm"`,
+   `wall_limit_s` from step 5, `label: "stability-r<seed>"`, `end_marker:
+   "DONE"`.
+7. `job_status` until done. `job_results` for the tarball.
+   `delete_results` when their data rules ask for it. On OpenMM jobs
+   `job_log` stays empty and the service checks only the exit code, not the
+   end marker. The progress lines and the final `DONE` are in `stdout.txt`
+   in the tarball. A replica without that `DONE` line did not finish.
 
 When your user has no number for stage 1, use this starting default: 3
 replicas, 100 ns each at 2 fs, for a protein under 300 residues. It is a
 starting default, not a recommendation for their system. Say so.
-The flow:
 
-1. `account`, to see the balance, the pricing and the packs.
-2. `capabilities` with `runner: "openmm"`, to see what the image has.
-3. `submit_job` with the script, the prepared system files, `runner:
-   "openmm"`, a `label`, a `wall_limit_s` and an `end_marker`. One job per
-   replica.
-4. `job_status` and `job_log` until done. `job_results` for the tarball.
-5. `delete_results` when their data rules ask for it.
+What comes back from each replica:
 
-You write and check the script with your user. We do not ship the stage 1
-protocol or the stage 2 protocols as hosted tools. A user who does not want
-to write the protocol takes the quoted path.
+- `residues.csv`: per residue, the backbone RMSF over production, the
+  fraction of its native contacts kept (CA pairs within 0.8 nm in the model,
+  more than 3 apart in sequence), and the pLDDT from the B-factor column.
+- `summary.json`: atoms, residues, steps, ns, mean temperature, box,
+  platform, speed, and the residues below `PLDDT_CUTOFF`. Low-confidence
+  residues are reported, never removed.
+- `state.csv`: step, time, temperature, energies and box volume.
+- `traj.dcd` and `checkpoint.chk`: the trajectory and a restart point.
+- `work.json`: the work record the job is billed from.
+
+The template does not measure the pocket. Name the pocket residues with your
+user and measure them from `traj.dcd`. Stage 2 protocols are not hosted
+tools. A user who wants stage 1 run for them takes the quoted path.
 
 ## Quoted, we run it
 
