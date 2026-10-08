@@ -64,6 +64,7 @@ Four skills come with the plugin. Start with `mdengine`, which routes to the oth
 | [`lammps-deck`](skills/lammps-deck/SKILL.md) | Writing or repairing a deck the hosted runner accepts, and reading the preflight verdicts. |
 | [`potentials`](skills/potentials/SKILL.md) | Choosing LJ, EAM, Tersoff, ReaxFF or an ionic potential, what each costs, and which run on the GPU. |
 | [`results`](skills/results/SKILL.md) | Turning a finished run into numbers and pictures: the analysis tools, the renderers, exports, fetching hosted results. |
+| [`dark-proteins-study`](skills/dark-proteins-study/SKILL.md) | Planning a study of a protein with only a predicted structure: what it answers, what to supply, what is self-serve and what is quoted. |
 
 ## Licensing
 
